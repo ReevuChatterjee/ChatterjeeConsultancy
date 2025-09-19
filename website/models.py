@@ -9,8 +9,8 @@ class custRequest(models.Model):
         ('interior', 'Interior'),
         ('urban', 'Urban / Landscape'),
     ]
-    type=models.CharField(choices=PROJECT_TYPES)
-    budget=models.CharField()
+    type=models.CharField(choices=PROJECT_TYPES,max_length=50)
+    budget=models.CharField(max_length=50)
     describe=models.TextField()
 
     
