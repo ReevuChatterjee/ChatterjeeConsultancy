@@ -80,10 +80,10 @@ WSGI_APPLICATION = 'chatterjeeConsultancy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
+DBS_URL=os.environ.get("DATABASE_URL")
 DATABASES = {
     "default": dj_database_url.parse(
-        "postgresql://chatterjeecconsultancy_user:1QsTlTnRfiOKE2vnt2NFgNjnnKuJ2BNl@dpg-d36dnkpr0fns73acofe0-a.oregon-postgres.render.com/chatterjeecconsultancy",  # paste full Render DB URL here
+        DBS_URL,  # paste full Render DB URL here
         conn_max_age=600,
         ssl_require=True,
     )
