@@ -16,7 +16,7 @@ def validate_email_api(email):
 def requestForm(request):
     if request.method=="POST":
         fullName=request.POST.get("name")
-        email=request.POST.get("email").lower()
+        email=request.POST.get("email","").lower().strip()
         result=validate_email_api(email)
         type=request.POST.get("type")
         budget=request.POST.get("budget")
