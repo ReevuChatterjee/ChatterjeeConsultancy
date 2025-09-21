@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "ciwcbwjebhcwheewih1234"#os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-PROD=True#os.environ.get("PROD","True").lower=="true"
+PROD=os.environ.get("PROD","True").lower=="true"
 if PROD==False:
     ALLOWED_HOSTS = ['.vercel.app','.now.sh']
     DEBUG = False
@@ -80,10 +80,10 @@ WSGI_APPLICATION = 'chatterjeeConsultancy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DBS_URL="postgresql://chatterjeecconsultancy_user:1QsTlTnRfiOKE2vnt2NFgNjnnKuJ2BNl@dpg-d36dnkpr0fns73acofe0-a.oregon-postgres.render.com/chatterjeecconsultancy"#os.environ.get("DATABASE_URL")
+DBS_URL=os.environ.get("DATABASE_URL")
 DATABASES = {
     "default": dj_database_url.parse(
-        DBS_URL,  # paste full Render DB URL here
+        DBS_URL, 
         conn_max_age=600,
         ssl_require=True,
     )
