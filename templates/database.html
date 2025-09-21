@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Database</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    tr:hover {
+      background: rgba(148, 163, 184, 0.1);
+      transition: background 0.3s ease;
+    }
+  </style>
+</head>
+<body class="p-8">
+
+  <!-- Header -->
+  <h1 class="text-4xl font-extrabold mb-8 text-center text-cyan-400">📊 Project Database</h1>
+
+  <!-- Controls -->
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <input type="text" id="searchInput" placeholder="🔍 Search projects..." 
+           class="p-3 rounded-lg w-full md:w-1/3 text-black focus:ring-2 focus:ring-cyan-500 outline-none transition">
+    <div class="flex gap-3">
+      <button onclick="exportPDF()" 
+              class="px-5 py-2 bg-green-600 hover:bg-green-700 rounded-xl shadow-lg transition transform hover:scale-105">
+        Export to PDF
+      </button>
+      <button onclick="refreshPage()" 
+              class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg transition transform hover:scale-105">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="overflow-x-auto glass rounded-2xl shadow-xl p-4">
+    <table class="min-w-full">
+      <thead class="text-cyan-300 text-lg border-b border-slate-500">
+        <tr>
+          <th class="py-3 px-4 text-left">Name</th>
+          <th class="py-3 px-4 text-left">Email</th>
+          <th class="py-3 px-4 text-left">Type</th>
+          <th class="py-3 px-4 text-left">Budget</th>
+          <th class="py-3 px-4 text-left">Description</th>
+          <th class="py-3 px-4 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="dataTable" class="text-slate-200">
+        {% for project in projects %}
+        <tr class="border-b border-slate-700 fade-in">
+          <td class="py-3 px-4 font-semibold">{{ project.fullName }}</td>
+          <td class="py-3 px-4">{{ project.email }}</td>
+          <td class="py-3 px-4 capitalize">{{ project.type }}</td>
+          <td class="py-3 px-4">{{ project.budget }}</td>
+          <td class="py-3 px-4 text-sm">{{ project.describe }}</td>
+          <td class="py-3 px-4">
+            <button onclick="deleteRow(this)" 
+                    class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-lg shadow-md transition transform hover:scale-110">
+              Delete
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Animate rows on load
+    window.addEventListener("load", () => {
+      gsap.to(".fade-in", {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power2.out"
+      });
+    });
+
+    // 🔍 Search
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+      let filter = this.value.toLowerCase();
+      let rows = document.querySelectorAll("#dataTable tr");
+      rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+      });
+    });
+
+    // 🗑️ Delete
+    function deleteRow(button) {
+      Swal.fire({
+        title: "Delete this entry?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          gsap.to(button.closest("tr"), {
+            opacity: 0,
+            x: -50,
+            duration: 0.5,
+            onComplete: () => button.closest("tr").remove()
+          });
+          Swal.fire("Deleted!", "The entry has been removed.", "success");
+        }
+      });
+    }
+
+    // 📄 Export PDF
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("Project Database", 14, 20);
+
+      let rows = [];
+      document.querySelectorAll("#dataTable tr").forEach(row => {
+        let cols = Array.from(row.children).map(td => td.innerText);
+        cols.pop(); // remove Actions col
+        rows.push(cols);
+      });
+
+      let y = 35;
+      rows.forEach((row, i) => {
+        doc.setFontSize(10);
+        doc.text(row.join(" | "), 14, y);
+        y += 8;
+      });
+
+      doc.save("projects.pdf");
+    }
+
+    // 🔄 Refresh
+    function refreshPage() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>

@@ -3,6 +3,8 @@ from .models import custRequest
 import requests
 API_KEY="3a9ce86145cb48f1b3a953c972f892e6"
 
+ALLOWED_IPS=['127.0.0.1','10.67.15.145']
+
 def home(request):
     error = request.session.pop("error", None)
     success = request.session.pop("success", None)
@@ -42,6 +44,10 @@ def requestForm(request):
             return redirect("home")
 
     return render(request,'index.html')
+
+def database(request):
+    data=custRequest.objects.all()
+    return render(request,"database.html",{"projects":data})
 
         
 
